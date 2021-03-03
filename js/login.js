@@ -18,9 +18,9 @@ function SendRegRequest(data, action, uuid, username)
         switch (xhr.status)
         {
             case 200:
-                console.log("got em");
                 setCookieWithExpirationDate("authId", uuid, 5 * 60);
                 setCookieWithExpirationDate("username", username, 5 * 60);
+                window.location.replace("/stories");
                 break;
 
             case 409:
@@ -41,7 +41,6 @@ function SendRegRequest(data, action, uuid, username)
     };
 
     data = JSON.stringify(data);
-    console.log("sending data: " + data);
     xhr.send(data);
 }
 
@@ -51,8 +50,6 @@ document.getElementById("EmuLogButton").addEventListener("click", (e) => {
     var password = "prujinata";
     
     var uuid = uuidv4();
-    console.log(`DEBUG: using UUID: ${uuid}`);
-
     SendRegRequest({"username": username, "password": password, "authid": uuid}, "login", uuid, username);
 });
 
@@ -62,7 +59,5 @@ document.getElementById("EmuRegButton").addEventListener("click", (e) => {
     var password = "prujinata";
     
     var uuid = uuidv4();
-    console.log(`DEBUG: using UUID: ${uuid}`);
-
     SendRegRequest({"username": username, "password": password, "authid": uuid}, "reguser", uuid, username);
 });

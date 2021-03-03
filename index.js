@@ -2,7 +2,6 @@ const Express = require("express");
 const sqlite3 = require("sqlite3");
 const path = require("path");
 const utils = require("./utils");
-const { json } = require("body-parser");
 
 const db = new sqlite3.Database("users.db");
 
@@ -20,19 +19,13 @@ app.get("/stories", (req, res) => {
     res.sendFile(path.join(__dirname, "html", "mainpage.html"));
 });
 
-
 //serve the login page
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "html", "login.html"));
 });
 
-
 //DATABASE HANDLING
 app.post("/api/reguser/", (req, res) => {
-    console.log(req.body.username);
-    console.log(req.body.password);
-    console.log(req.body.authid);
-
     db.run(`INSERT INTO 'users'('username', 'password', 'authId') VALUES (?,?,?)`, [req.body.username, req.body.password, req.body.authid], (err) => {
         if (err)
         {
@@ -65,6 +58,31 @@ app.post("/api/login/", (req, res) => {
                     if (err) { console.log(err);}
                     res.send(200);
                 });
+            }
+            else
+            {
+                res.send(403);
+            }
+        }
+    });
+});
+
+app.post("/api/checkId/", (req, res) => {
+    db.get(`SELECT username,authId FROM users WHERE username='${req.body.username}'`, [], (err, rows) => {
+        if (err)
+        {
+            console.log(err);
+            res.send(500);
+        }
+        else if (rows == undefined) //no user found in db
+        {
+            res.send(404);
+        }
+        else
+        {
+            if (req.body.id == rows.authId)
+            {
+                res.send(200);
             }
             else
             {
