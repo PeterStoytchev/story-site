@@ -1,0 +1,23 @@
+a
+{
+    text-decoration:none;
+    color: black;
+}
+
+#MainPageTable
+{
+    margin-left: auto; 
+    margin-right: auto;
+    width: 100%;
+    border: 2px solid black;
+}
+
+#MainPageTable th
+{
+    font-size: x-large;
+}
+
+#HeadDiv
+{
+    text-align: center;
+}
