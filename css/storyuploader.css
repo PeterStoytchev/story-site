@@ -1,0 +1,23 @@
+body
+{
+    font-size: xx-large;
+}
+
+input, select
+{
+    width: 80%;
+    height: 30px;
+    font-size: x-large;
+}
+
+button
+{
+    width: 20%;
+    height: 55px;
+    font-size: xx-large;
+}
+
+p
+{
+    font-weight: bold;
+}

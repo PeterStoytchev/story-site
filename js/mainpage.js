@@ -16,4 +16,4 @@ var username = accessCookie("username");
 var titleHeader = document.getElementById("WelcomeH");
 titleHeader.innerText = titleHeader.innerText + ", " + username;
 
-document.getElementById("ProfileLink").href = "/profile/" + username;
+//document.getElementById("ProfileLink").href = "/profile/" + username;

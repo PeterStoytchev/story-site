@@ -3,7 +3,7 @@ const sqlite3 = require("sqlite3");
 const path = require("path");
 const utils = require("./utils");
 
-const db = new sqlite3.Database("users.db");
+const db = new sqlite3.Database("data.db");
 
 utils.InitDB(db);
 
@@ -24,9 +24,19 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "html", "login.html"));
 });
 
+//serve the user profile page
+app.get("/profile", (req, res) => {
+    res.sendFile(path.join(__dirname, "html", "userprofile.html"));
+});
+
+//serve the story uploader
+app.get("/storyuploader/", (req, res) => {
+    res.sendFile(path.join(__dirname, "html", "storyuploader.html"));
+});
+
 //DATABASE HANDLING
 app.post("/api/reguser/", (req, res) => {
-    db.run(`INSERT INTO 'users'('username', 'password', 'authId') VALUES (?,?,?)`, [req.body.username, req.body.password, req.body.authid], (err) => {
+    db.run(`INSERT INTO 'users'('username', 'password', 'authId', 'userId') VALUES (?,?,?)`, [req.body.username, req.body.password, req.body.authid], (err) => {
         if (err)
         {
             console.log(err);
