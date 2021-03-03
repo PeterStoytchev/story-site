@@ -1,4 +1,3 @@
-
 function accessCookie(cookieName)
 {
     var name = cookieName + "=";

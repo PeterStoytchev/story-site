@@ -1,3 +1,5 @@
+//@Todo: make it so that when someone with a valid authId visits this page, it redirects them to the stories page 
+
 function setCookieWithExpirationDate(cookieId, cookieValue, secondsToExpiteFromNow)
 {
     var now = new Date();
@@ -7,7 +9,7 @@ function setCookieWithExpirationDate(cookieId, cookieValue, secondsToExpiteFromN
     document.cookie = cookieId + "=" + cookieValue + ";expires=" + now.toUTCString() +";path=/";
 }
 
-function SendRegRequest(data, action, uuid)
+function SendRegRequest(data, action, uuid, username)
 {
     var xhr = new XMLHttpRequest();
     xhr.open("POST", `/api/${action}/`, true);
@@ -18,6 +20,7 @@ function SendRegRequest(data, action, uuid)
             case 200:
                 console.log("got em");
                 setCookieWithExpirationDate("authId", uuid, 5 * 60);
+                setCookieWithExpirationDate("username", username, 5 * 60);
                 break;
 
             case 409:
@@ -50,7 +53,7 @@ document.getElementById("EmuLogButton").addEventListener("click", (e) => {
     var uuid = uuidv4();
     console.log(`DEBUG: using UUID: ${uuid}`);
 
-    SendRegRequest({"username": username, "password": password, "authid": uuid}, "login", uuid);
+    SendRegRequest({"username": username, "password": password, "authid": uuid}, "login", uuid, username);
 });
 
 document.getElementById("EmuRegButton").addEventListener("click", (e) => {
@@ -61,5 +64,5 @@ document.getElementById("EmuRegButton").addEventListener("click", (e) => {
     var uuid = uuidv4();
     console.log(`DEBUG: using UUID: ${uuid}`);
 
-    SendRegRequest({"username": username, "password": password, "authid": uuid}, "reguser", uuid);
+    SendRegRequest({"username": username, "password": password, "authid": uuid}, "reguser", uuid, username);
 });
