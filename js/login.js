@@ -7,19 +7,33 @@ function setCookieWithExpirationDate(cookieId, cookieValue, secondsToExpiteFromN
     document.cookie = cookieId + "=" + cookieValue + ";expires=" + now.toUTCString() +";path=/";
 }
 
-function SendRegRequest(data)
+function SendRegRequest(data, action, uuid)
 {
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/reguser/", true);
+    xhr.open("POST", `/api/${action}/`, true);
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) 
+        switch (xhr.status)
         {
-            var json = JSON.parse(xhr.responseText);
-            if (json.code == 200)
-            {
+            case 200:
                 console.log("got em");
-            }
+                setCookieWithExpirationDate("authId", uuid, 5 * 60);
+                break;
+
+            case 409:
+                console.log("a user with such username already exists");
+                break;
+
+            case 403:
+                console.log("Invalid credentials");
+                break;
+
+            case 404:
+                console.log("Couldnt find a user with such username");
+                break;
+            case 500:
+                console.log("Internal server error, try again later!");
+                break;
         }
     };
 
@@ -29,11 +43,14 @@ function SendRegRequest(data)
 }
 
 document.getElementById("EmuLogButton").addEventListener("click", (e) => {
+    //@Todo: thease are here for debug purposes only, replace the with propeper input for username and password
+    var username = "predictora";
+    var password = "prujinata";
+    
     var uuid = uuidv4();
-    setCookieWithExpirationDate("authId", uuid, 5 * 60);
     console.log(`DEBUG: using UUID: ${uuid}`);
 
-    //update the DB with the new ID
+    SendRegRequest({"username": username, "password": password, "authid": uuid}, "login", uuid);
 });
 
 document.getElementById("EmuRegButton").addEventListener("click", (e) => {
@@ -42,8 +59,7 @@ document.getElementById("EmuRegButton").addEventListener("click", (e) => {
     var password = "prujinata";
     
     var uuid = uuidv4();
-    setCookieWithExpirationDate("authId", uuid, 5 * 60);
     console.log(`DEBUG: using UUID: ${uuid}`);
 
-    SendRegRequest({"username": username, "password": password, "authid": uuid});
+    SendRegRequest({"username": username, "password": password, "authid": uuid}, "reguser", uuid);
 });

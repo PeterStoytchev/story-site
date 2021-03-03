@@ -1,5 +1,12 @@
 const Express = require("express");
+const sqlite3 = require("sqlite3");
 const path = require("path");
+const utils = require("./utils");
+const { json } = require("body-parser");
+
+const db = new sqlite3.Database("users.db");
+
+utils.InitDB(db);
 
 const app = new Express();
 app.use(Express.urlencoded({ extended: true})); //json parsing for post requests
@@ -21,14 +28,50 @@ app.get("/", (req, res) => {
 
 
 //DATABASE HANDLING
-
 app.post("/api/reguser/", (req, res) => {
     console.log(req.body.username);
     console.log(req.body.password);
     console.log(req.body.authid);
 
-    res.send(JSON.stringify({"code": 200}));
+    db.run(`INSERT INTO 'users'('username', 'password', 'authId') VALUES (?,?,?)`, [req.body.username, req.body.password, req.body.authid], (err) => {
+        if (err)
+        {
+            console.log(err);
+            res.send(409);
+        }
+        else
+        {
+            res.send(200);
+        }
+    });
 });
 
+app.post("/api/login/", (req, res) => {
+    db.get(`SELECT username,password FROM users WHERE username='${req.body.username}'`, [], (err, rows) => {
+        if (err)
+        {
+            console.log(err);
+            res.send(500);
+        }
+        else if (rows == undefined) //no user found in db
+        {
+            res.send(404);
+        }
+        else
+        {
+            if (req.body.password == rows.password)
+            {
+                db.run("UPDATE users SET authId = ? WHERE username = ?", [req.body.authid, req.body.username], (err) => {
+                    if (err) { console.log(err);}
+                    res.send(200);
+                });
+            }
+            else
+            {
+                res.send(403);
+            }
+        }
+    });
+});
 
 app.listen(3000);
