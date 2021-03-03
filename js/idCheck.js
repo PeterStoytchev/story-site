@@ -21,10 +21,6 @@ function checkIfValid(data)
         {
             window.location.replace("/");
         }
-        else
-        {
-            console.log("Valid id!");
-        }
     };
 
     data = JSON.stringify(data);

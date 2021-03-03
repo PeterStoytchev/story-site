@@ -11,13 +11,9 @@ function accessCookie(cookieName)
 	return "NULL";
 }
 
-var authId = accessCookie("authId");
+var username = accessCookie("username");
 
-if (authId == "NULL")
-{
-    window.location.replace("/");
-}
-else
-{
-    console.log("your user id is: " + authId);
-}
+var titleHeader = document.getElementById("WelcomeH");
+titleHeader.innerText = titleHeader.innerText + ", " + username;
+
+document.getElementById("ProfileLink").href = "/profile/" + username;
