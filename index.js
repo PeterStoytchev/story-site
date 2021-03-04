@@ -2,6 +2,7 @@ const Express = require("express");
 const sqlite3 = require("sqlite3");
 const path = require("path");
 const utils = require("./utils");
+const crypto = require('crypto');
 
 const db = new sqlite3.Database("data.db");
 
@@ -34,9 +35,97 @@ app.get("/storyuploader/", (req, res) => {
     res.sendFile(path.join(__dirname, "html", "storyuploader.html"));
 });
 
+//serve the story uploader
+app.get("/stories/:storyId", (req, res) => {
+    var storyId = req.params["storyId"];
+
+    db.get(`SELECT author_username,storyTitle,storyType,storyText FROM story_index WHERE storyId= ?`, [storyId], (err, rows) => {
+        if (err)
+        {
+            console.log(err);
+            res.send(500);
+        }
+        else if (rows == undefined)
+        {
+            var html = `<html><head><title>Not Found</title></head> <body> <h1 style="text-align:center">Could't find this story!</h1></body></html>`;
+            res.send(html);
+        }
+        else
+        {
+            var html = `<html><head><title>${rows.storyTitle}</title> <link rel="stylesheet" href="../../storyviewer.css"> </head> <body> <h1>${rows.storyTitle}</h1></body></html>`;
+            html = html + `<h2>Written by ${rows.author_username}</h2> <p>${rows.storyText}</p> </body></html>`;
+            res.send(html);
+        }
+    });
+});
+
+
+//handle story uploads
+app.post("/storyuploader/upload", (req, res) => {
+    const body = req.body;
+    const story_hash = crypto.createHash('md5').update(body.text).digest("hex");
+    db.run(`INSERT INTO 'story_index'('author_username', 'storyTitle', 'storyType', 'storyId', 'storyText') VALUES (?,?,?,?,?)`, [body.author, body.storyName, body.storyType, story_hash, body.text], (err) => {
+        if (err)
+        {
+            console.log(err);
+            res.send(409);
+        }
+        else
+        {
+            db.get(`SELECT storyIds FROM users WHERE username= ?`, [body.author], (err, rows) => {
+                var split = rows.storyIds.split(';');
+                if (split[0] != "NULL")
+                {
+                    split.push(story_hash);
+                }
+                else
+                {
+                    split = [story_hash];
+                }
+
+                var str = split[0];
+                for (var i = 1; i < split.length; i++)
+                {
+                    str = str + ";" + split[i];
+                }
+
+                db.run("UPDATE users SET storyIds = ? WHERE username = ?", [str, body.author], (err) => {
+                    if (err) { console.log(err);}
+                });
+
+                res.send(200);
+            });
+        }
+    });
+});
+
 //DATABASE HANDLING
+app.post("/api/getuserstories/", (req, res) => {
+    db.all(`SELECT storyTitle,storyType,storyId FROM story_index WHERE author_username= ?`, [req.body.username], (err, rows) => {
+        if (err)
+        {
+            console.log(err);
+            res.send(409);
+        }
+        else
+        {
+            var titles = [];
+            var storyIds = [];
+            var storyTypes = [];
+
+            rows.forEach(row => {
+                titles.push(row.storyTitle);
+                storyIds.push(row.storyId);
+                storyTypes.push(row.storyType);
+            });
+
+            res.send(JSON.stringify({"titles": titles, "storyIds": storyIds, "storyTypes": storyTypes}));
+        }
+    });
+});
+
 app.post("/api/reguser/", (req, res) => {
-    db.run(`INSERT INTO 'users'('username', 'password', 'authId', 'userId') VALUES (?,?,?)`, [req.body.username, req.body.password, req.body.authid], (err) => {
+    db.run(`INSERT INTO 'users'('username', 'password', 'authId', 'storyIds') VALUES (?,?,?,?)`, [req.body.username, req.body.password, req.body.authid, "NULL"], (err) => {
         if (err)
         {
             console.log(err);

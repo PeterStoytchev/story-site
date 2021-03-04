@@ -1,1 +1,0 @@
-@Security: dont trust the browser for authId expiration

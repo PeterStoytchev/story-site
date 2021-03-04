@@ -1,3 +1,0 @@
-title <text field>
-genre <drop down>
-rtf file upload

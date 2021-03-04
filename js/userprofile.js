@@ -1,3 +1,5 @@
+var isGenerated = false;
+
 function accessCookie(cookieName)
 {
     var name = cookieName + "=";
@@ -10,19 +12,53 @@ function accessCookie(cookieName)
     }
 }
 
-var pageTitle = document.getElementById("PageTitle");
-pageTitle.innerText = pageTitle.innerText + ", " + accessCookie("username");
+function SetUserStories(tableHolder)
+{
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", `/api/getuserstories/`, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function () {
+        switch (xhr.status)
+        {
+            case 200:
+                SetTable(JSON.parse( xhr.responseText), tableHolder);
+                break;
 
+            case 404:
+                tableHolder.innerHTML = "<h3>You haven't posted any stories, yet!</h3>";
+                break;
+            case 500:
+                console.log("Internal server error, try again later!");
+                break;
+        }
+    };
+
+    var data = JSON.stringify({"username": username});
+    xhr.send(data);
+}
+
+function SetTable(data, tableHolder)
+{
+    if (!isGenerated)
+    {
+        isGenerated = true;
+
+        var tableHTML = "<table id='StoriesTable'> <tr> <th>Title</th> <th>Genre</th></tr>";
+        for (var i =0; i < data.titles.length; i++)
+        {
+            tableHTML = tableHTML + "<tr> <td><a href='/stories/" + data.storyIds[i] + "/'>" + data.titles[i] + "</a></td>";
+            tableHTML = tableHTML + "<td>" + data.storyTypes[i] + "</td></tr>";
+        }
+
+        tableHTML = tableHTML + "</tr></table>";
+
+        tableHolder.innerHTML = tableHTML;
+    }
+}
+
+var pageTitle = document.getElementById("PageTitle");
+pageTitle.innerText = pageTitle.innerText + ", " + username;
 
 var tableHolder = document.getElementById("TableHolder");
 
-//table generation
-if (false) //Todo: check if the user has written any stories
-{
-    tableHolder.innerHTML = "<h2>Here are your stories</h2> <table id='MainPageTable'>"
-    //TODO: table generation
-}
-else
-{
-    tableHolder.innerHTML = "<h3>You haven't posted any stories, yet!</h3>";
-}
+SetUserStories(tableHolder);
