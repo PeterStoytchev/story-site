@@ -2,10 +2,23 @@
 <html>
 <head>
     <title>Registration and login page</title>
+    <link rel="stylesheet" href="loginpage.css">
 </head>
 <body>
-    <button id="EmuRegButton">Press me to emulate a registartion</button>
-    <button id="EmuLogButton">Press me to emulate a login</button>
+    <h1>Please register or login</h1>
+    
+    <p>Username:</p>
+    <input id="usernameField" type="text"></input>
+
+    <p>Password:</p>
+    <input id="passwordField" type="password"></input>
+
+    <h6></h6>
+    <button id="LoginButton">Login</button>
+    <button id="RegisterButton">Register</button>
+
+    <p style="color: red" id="ErrorP"></p>
+
     <script src="uuidv4.js"></script>
     <script src='login.js'></script>
 </body>

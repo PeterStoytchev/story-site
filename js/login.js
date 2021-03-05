@@ -1,5 +1,7 @@
 //@Todo: make it so that when someone with a valid authId visits this page, it redirects them to the stories page 
 
+var errorField = document.getElementById("ErrorP");
+
 function setCookieWithExpirationDate(cookieId, cookieValue, secondsToExpiteFromNow)
 {
     var now = new Date();
@@ -24,18 +26,18 @@ function SendRegRequest(data, action, uuid, username)
                 break;
 
             case 409:
-                console.log("a user with such username already exists");
+                errorField.innerText = "A user with such username already exists!";
                 break;
 
             case 403:
-                console.log("Invalid credentials");
+                errorField.innerText = "Invalid credentials!";
                 break;
 
             case 404:
-                console.log("Couldnt find a user with such username");
+                errorField.innerText = "Couldnt find a user with such username!";
                 break;
             case 500:
-                console.log("Internal server error, try again later!");
+                errorField.innerText = "Internal server error, try again later!";
                 break;
         }
     };
@@ -44,20 +46,19 @@ function SendRegRequest(data, action, uuid, username)
     xhr.send(data);
 }
 
-document.getElementById("EmuLogButton").addEventListener("click", (e) => {
-    //@Todo: thease are here for debug purposes only, replace the with propeper input for username and password
-    var username = "predictora";
-    var password = "prujinata";
-    
+document.getElementById("LoginButton").addEventListener("click", (e) => {
     var uuid = uuidv4();
+
+    var username = document.getElementById("usernameField").value;
+    var password = document.getElementById("passwordField").value;
     SendRegRequest({"username": username, "password": password, "authid": uuid}, "login", uuid, username);
 });
 
-document.getElementById("EmuRegButton").addEventListener("click", (e) => {
-    //@Todo: thease are here for debug purposes only, replace the with propeper input for username and password
-    var username = "predictora";
-    var password = "prujinata";
-    
+document.getElementById("RegisterButton").addEventListener("click", (e) => {
     var uuid = uuidv4();
+
+    var username = document.getElementById("usernameField").value;
+    var password = document.getElementById("passwordField").value;
+
     SendRegRequest({"username": username, "password": password, "authid": uuid}, "reguser", uuid, username);
 });

@@ -35,7 +35,36 @@ app.get("/storyuploader/", (req, res) => {
     res.sendFile(path.join(__dirname, "html", "storyuploader.html"));
 });
 
-//serve the story uploader
+//serve the story category browser
+app.get("/categories/:storyType", (req, res) => {
+    var storyType = req.params["storyType"];
+
+    var html = `<html><head><title>Categories!</title> <link rel="stylesheet" href="../../storyviewer.css"></head> <body>`;
+    html = html + `<h1>Here are all stories that are in the ${storyType} category!</h1>`;
+
+    db.all(`SELECT author_username,storyTitle,storyId FROM story_index WHERE storyType= ?`, [storyType], (err, rows) => {
+        if (err)
+        {
+            console.log(err);
+            res.send(500);
+        }
+        else if (rows == undefined || rows.length == 0)
+        {
+            html = html + `<h2>There are no stories in this category!</h2></body></html>`;
+            res.send(html);
+        }
+        else
+        {
+            rows.forEach(row => {
+                html = html + `<h2><a href='/stories/${row.storyId}'>${row.storyTitle}, written by: ${row.author_username}</h2></body></html>`;
+            });
+            res.send(html);
+        }
+    });
+});
+
+
+//serve the story viewer
 app.get("/stories/:storyId", (req, res) => {
     var storyId = req.params["storyId"];
 
