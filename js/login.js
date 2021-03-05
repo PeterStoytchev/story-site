@@ -20,8 +20,8 @@ function SendRegRequest(data, action, uuid, username)
         switch (xhr.status)
         {
             case 200:
-                setCookieWithExpirationDate("authId", uuid, 5 * 60);
-                setCookieWithExpirationDate("username", username, 5 * 60);
+                setCookieWithExpirationDate("authId", uuid, 7 * 24 * 60 * 60);
+                setCookieWithExpirationDate("username", username, 7 * 24 * 60 * 60);
                 window.location.replace("/stories");
                 break;
 
