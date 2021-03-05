@@ -2,6 +2,10 @@
 
 var errorField = document.getElementById("ErrorP");
 
+function isEmptyOrSpaces(str){
+    return str === null || str.match(/^ *$/) !== null;
+}
+
 function setCookieWithExpirationDate(cookieId, cookieValue, secondsToExpiteFromNow)
 {
     var now = new Date();
@@ -51,6 +55,7 @@ document.getElementById("LoginButton").addEventListener("click", (e) => {
 
     var username = document.getElementById("usernameField").value;
     var password = document.getElementById("passwordField").value;
+
     SendRegRequest({"username": username, "password": password, "authid": uuid}, "login", uuid, username);
 });
 
@@ -60,5 +65,12 @@ document.getElementById("RegisterButton").addEventListener("click", (e) => {
     var username = document.getElementById("usernameField").value;
     var password = document.getElementById("passwordField").value;
 
-    SendRegRequest({"username": username, "password": password, "authid": uuid}, "reguser", uuid, username);
+    if (!(isEmptyOrSpaces(username) && isEmptyOrSpaces(password)))
+    {
+        SendRegRequest({"username": username, "password": password, "authid": uuid}, "reguser", uuid, username);
+    }
+    else
+    {
+        errorField.innerText = "You need to specify a username and password!";
+    }
 });

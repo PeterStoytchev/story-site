@@ -43,6 +43,9 @@ uploadButton.addEventListener("click", (e) => {
                     case 200:
                         window.location.replace("/profile/");
                         break;
+                    case 409:
+                        alert("This story has already been uploaded to the site!");
+                        break;
                 }
             }
 
